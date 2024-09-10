@@ -42,7 +42,7 @@ handler.post(
     const contract = req?.query.contract as string;
     const backfill = req?.query.backfill as string;
 
-    if (!contract || !type || backfill == null || backfill == undefined) {
+    if (!contract || !type || backfill == null) {
       return res.status(400).json({
         error: {
           status: 400,

@@ -3,7 +3,7 @@
   "version": "2.0.8",
   "scripts": {
     "start": " yarn database:prepare && yarn build && yarn build:viewer && yarn move && node dist/index.js",
-    "build": "yarn run clean && tsc",
+    "build": "yarn run clean && yarn run tsc",
     "build:viewer": "cd src/viewer && yarn build",
     "develop": "nodemon",
     "database:introspect": "yarn database:apply && yarn database:resolve",
@@ -66,7 +66,6 @@
     "sentry": "^0.1.2",
     "swr": "^2.2.0",
     "ts-node": "10.9.1",
-    "tsc": "^2.0.4",
     "typescript": "^4.9.5",
     "uuid": "^9.0.0",
     "uuidv4": "^6.2.13",

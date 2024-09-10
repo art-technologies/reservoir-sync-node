@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"  # Map container port 3000 to host port 3000
+    environment:
+      # Server Configuration
+      - PORT=3000  # Replace with your desired port
+      - AUTHORIZATION=your-authorization-token  # Replace with your actual authorization token
+
+      # Database Configuration
+      - DATABASE_URL=postgres://user:password@db:5432/mydb  # Replace with your actual database URL
+
+      # Redis Configuration
+      - REDIS_URL=redis://redis:6379  # Redis connection string for your app
+
+      # Syncer Configuration
+      - CHAIN=mainnet  # Replace with your chain (e.g., mainnet, goerli, etc.)
+      - SYNC_SALES=1  # Enable syncing of sales (1 = TRUE, 0 = FALSE)
+      - SYNC_ASKS=1  # Enable syncing of asks (1 = TRUE, 0 = FALSE)
+      - SYNC_TRANSFERS=1  # Enable syncing of transfers (1 = TRUE, 0 = FALSE)
+      - SYNC_BIDS=1  # Enable syncing of bids (1 = TRUE, 0 = FALSE)
+      - SOURCES=opensea # Replace with your actual sources
+      - MODE=normal  # Replace with your desired mode (slow, normal, fast)
+      - USE_BACKUP=1  # Enable or disable usage of Redis backup (1 = TRUE, 0 = FALSE)
+    depends_on:
+      - db  # Ensure the database service starts before the app
+      - redis  # Ensure Redis service starts before the app
+    volumes:
+      - ./.env:/app/.env
+      - ./contracts.txt:/app/contracts.txt
+
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: mydb
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"  # Map container port 5432 to host port 5432 for database access
+
+  redis:
+    image: redis:7.4.0-alpine
+    volumes:
+      - redis_data:/data  # Persistent storage for Redis data
+    ports:
+      - "6379:6379"  # Map container port 6379 to host port 6379 for Redis access
+
+volumes:
+  postgres_data:
+  redis_data:

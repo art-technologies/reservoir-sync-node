@@ -655,7 +655,7 @@ class _GraphQlService {
                   take: 1000,
                 })
                 .then((sales: unknown) => sales)
-                .catch((e) => console.log(e));
+                .catch((e: any) => console.log(e));
             },
           },
         },

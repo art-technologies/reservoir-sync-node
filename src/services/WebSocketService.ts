@@ -149,6 +149,8 @@ class _WebSocketService {
         this._isConnected = true;
         this._onConnect();
         return;
+      } else if (type === 'connection' && status === 'error') {
+        LoggerService.error("failed to connect to websocket: " + JSON.stringify(data))
       }
 
       this._insert(event, data);
@@ -191,7 +193,9 @@ class _WebSocketService {
     this._isConnected = false;
 
     try {
-      this._ws?.close();
+      if (this._ws?.readyState === WebSocket.OPEN) {
+        this._ws?.close();
+      }
       const r = setInterval(() => {
         this._connect();
         if (this._isConnected) clearInterval(r);
