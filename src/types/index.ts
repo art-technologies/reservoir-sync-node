@@ -7,12 +7,13 @@ import { Application } from "express";
 
 export enum URLs {
   "mainnet" = "wss://ws.reservoir.tools",
-  "goerli" = "wss://ws-goerli.reservoir.tools",
   "polygon" = "wss://ws-polygon.reservoir.tools",
   "mumbai" = "wss://ws-mumbai.reservoir.tools",
   "arbitrum" = "wss://ws-arbitrum.reservoir.tools",
   "sepolia" = "wss://ws-sepolia.reservoir.tools",
   "optimism" = "wss://ws-optimism.reservoir.tools",
+  "base" = "wss://ws-base.reservoir.tools",
+  "zora" = "wss://ws-zora.reservoir.tools"
 }
 
 export type KnownPropertiesType = {
@@ -56,12 +57,13 @@ export type DataSets =
 
 export type Chains =
   | "mainnet"
-  | "goerli"
   | "polygon"
   | "arbitrum"
   | "mumbai"
   | "optimism"
-  | "sepolia";
+  | "sepolia"
+  | "base"
+  | "zora";
 
 export type MessageType = "connection";
 

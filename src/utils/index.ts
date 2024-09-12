@@ -19,6 +19,7 @@ import {
   Schemas,
   SuccessType,
 } from "../types";
+import {reservoir} from "../pb/reservoir";
 /**
  * # isTodayUTC
  * @param dateString - Date string
@@ -192,11 +193,12 @@ export const splitArray = <T>(arr: T[], parts: number): T[][] => {
 const chains: Record<Chains, number> = {
   arbitrum: 42161,
   mainnet: 1,
-  goerli: 5,
   polygon: 137,
   mumbai: 80001,
   optimism: 10,
   sepolia: 11155111,
+  base: 8453,
+  zora: 7777777,
 };
 
 export const getChainId = (): string => {
@@ -205,16 +207,30 @@ export const getChainId = (): string => {
   return chains[chainName].toString();
 };
 
+export const getPbChain = (): reservoir.Chain => {
+  switch (process.env.CHAIN as Chains) {
+    case "mainnet": return reservoir.Chain.MAINNET
+    case "sepolia": return reservoir.Chain.SEPOLIA
+    case "mumbai": return reservoir.Chain.MUMBAI
+    case "arbitrum": return reservoir.Chain.ARBITRUM
+    case "polygon": return reservoir.Chain.POLYGON
+    case "optimism": return reservoir.Chain.OPTIMISM
+    case "base": return reservoir.Chain.BASE
+    case "zora": return reservoir.Chain.ZORA
+  }
+}
+
 export const END_OF_TIME = 253402300799;
 
 export const UrlBase = {
   mainnet: "https://api.reservoir.tools",
-  goerli: "https://api-goerli.reservoir.tools",
   sepolia: "https://api-sepolia.reservoir.tools",
   polygon: "https://api-polygon.reservoir.tools",
   mumbai: "https://api-mumbai.reservoir.tools",
   arbitrum: "https://api-arbitrum.reservoir.tools",
   optimism: "https://api-optimism.reservoir.tools",
+  base: "https://api-base.reservoir.tools",
+  zora: "https://api-zora.reservoir.tools"
 } as const;
 
 export const UrlPaths = {

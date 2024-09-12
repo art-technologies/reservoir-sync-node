@@ -33,6 +33,8 @@ services:
     volumes:
       - ./.env:/app/.env
       - ./contracts.txt:/app/contracts.txt
+    profiles:
+      - app
 
   db:
     image: postgres:13
@@ -51,6 +53,19 @@ services:
       - redis_data:/data  # Persistent storage for Redis data
     ports:
       - "6379:6379"  # Map container port 6379 to host port 6379 for Redis access
+
+  nats:
+    image: nats:2.9.18
+    command: -m 8222 -js --cluster_name NATS --cluster nats://0.0.0.0:6222 --name n1 --routes nats://nats:6222,nats://nats2:6222,nats://nats3:6222
+    ports:
+      - "4222:4222"
+      - "8222:8222"
+  nats2:
+    image: nats:2.9.18
+    command: -m 8222 -js --cluster_name NATS --cluster nats://0.0.0.0:6222 --name n2 --routes nats://nats:6222,nats://nats2:6222,nats://nats3:6222
+  nats3:
+    image: nats:2.9.18
+    command: -m 8222 -js --cluster_name NATS --cluster nats://0.0.0.0:6222 --name n3 --routes nats://nats:6222,nats://nats2:6222,nats://nats3:6222
 
 volumes:
   postgres_data:

@@ -93,7 +93,8 @@ class SyncNode {
     });
 
     await this._insertionService.launch();
-    await this._webSocketService.launch();
+    // do not await for websocket to start
+    this._webSocketService.launch();
     LoggerService.info(`Launched All Services`);
 
     await this._queueService.loadContracts();

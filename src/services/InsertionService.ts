@@ -12,6 +12,7 @@ import {
 import { addressToBuffer, toBuffer, toString, getChainId } from "../utils";
 import { LoggerService } from "./LoggerService";
 import { QueueService } from "./QueueService";
+import {NatsInsertionService} from "./NatsInsertionService";
 
 interface DataSchemas {
   sales: SalesSchema;
@@ -32,6 +33,7 @@ interface DataReturns {
  * The _InsertionService class provides an interface to the Prisma ORM.
  * This service handles database connections, data upserts, and record counting.
  */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 class _InsertionService {
   /**
    * Prisma ORM instance
@@ -382,4 +384,4 @@ class _InsertionService {
  * The InsertionService is an instance of the _InsertionService class,
  * allowing for singleton-like usage throughout the application.
  */
-export const InsertionService = new _InsertionService();
+export const InsertionService = new NatsInsertionService();

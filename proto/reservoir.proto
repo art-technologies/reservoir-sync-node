@@ -1,0 +1,180 @@
+syntax = "proto3";
+
+package reservoir;
+
+enum Chain {
+  MAINNET = 0;
+  POLYGON = 1;
+  ARBITRUM = 2;
+  MUMBAI = 3;
+  OPTIMISM = 4;
+  SEPOLIA = 5;
+  BASE = 6;
+  ZORA = 7;
+}
+
+message Amount {
+  string raw = 1;
+  double decimal = 2;
+  double usd = 3;
+  double native = 4;
+}
+
+message Currency {
+  string contract = 1;
+  string name = 2;
+  string symbol = 3;
+  int32 decimals = 4;
+}
+
+message Price {
+  Currency currency = 1;
+  Amount amount = 2;
+  Amount netAmount = 3;
+}
+
+message TokenData {
+  string tokenId = 1;
+  string name = 2;
+  string image = 3;
+}
+
+message CollectionData {
+  string id = 1;
+  string name = 2;
+  string image = 3;
+}
+
+message CriteriaData {
+  TokenData token = 1;
+  CollectionData collection = 2;
+}
+
+message Criteria {
+  string kind = 1;
+  CriteriaData data = 2;
+}
+
+message Source {
+  string id = 1;
+  string domain = 2;
+  string name = 3;
+  string icon = 4;
+  string url = 5;
+}
+
+message FeeBreakdown {
+  int32 bps = 1;
+  string kind = 2;
+  string recipient = 3;
+}
+
+message Ask {
+  string id = 1;
+  string kind = 2;
+  string side = 3;
+  string status = 4;
+  string tokenSetId = 5;
+  string tokenSetSchemaHash = 6;
+  string contract = 7;
+  string maker = 8;
+  string taker = 9;
+  Price price = 10;
+  int64 validFrom = 11;
+  int64 validUntil = 12;
+  double quantityFilled = 13;
+  double quantityRemaining = 14;
+  Criteria criteria = 15;
+  Source source = 16;
+  int32 feeBps = 17;
+  repeated FeeBreakdown feeBreakdown = 18;
+  int64 expiration = 19;
+  bool isReservoir = 20;
+  bool isDynamic = 21;
+  string createdAt = 22;
+  string updatedAt = 23;
+  Chain chain = 24;
+}
+
+message Bid {
+  string id = 1;
+  string kind = 2;
+  string side = 3;
+  string status = 4;
+  string tokenSetId = 5;
+  string tokenSetSchemaHash = 6;
+  string contract = 7;
+  string maker = 8;
+  string taker = 9;
+  Price price = 10;
+  int64 validFrom = 11;
+  int64 validUntil = 12;
+  double quantityFilled = 13;
+  double quantityRemaining = 14;
+  Criteria criteria = 15;
+  Source source = 16;
+  int32 feeBps = 17;
+  repeated FeeBreakdown feeBreakdown = 18;
+  int64 expiration = 19;
+  bool isReservoir = 20;
+  bool isDynamic = 21;
+  string createdAt = 22;
+  string updatedAt = 23;
+  Chain chain = 24;
+}
+
+message Transfer {
+  string id = 1;
+  Token token = 2;
+  string from = 3;
+  string to = 4;
+  string amount = 5;
+  int64 block = 6;
+  string txHash = 7;
+  int32 logIndex = 8;
+  int32 batchIndex = 9;
+  int64 timestamp = 10;
+  bool isDeleted = 11;
+  string createdAt = 12;
+  string updatedAt = 13;
+  Chain chain = 14;
+}
+
+message Collection {
+  string id = 1;
+  string name = 2;
+}
+
+message Token {
+  string contract = 1;
+  string tokenId = 2;
+  optional string name = 3;
+  optional string image = 4;
+  optional Collection collection = 5;
+}
+
+message Sale {
+  string id = 1;
+  string saleId = 2;
+  Token token = 3;
+  string orderId = 4;
+  string orderSource = 5;
+  string orderSide = 6;
+  string orderKind = 7;
+  string from = 8;
+  string to = 9;
+  string amount = 10;
+  string fillSource = 11;
+  int64 block = 12;
+  string txHash = 13;
+  int32 logIndex = 14;
+  int32 batchIndex = 15;
+  int64 timestamp = 16;
+  Price price = 17;
+  double washTradingScore = 18;
+  string createdAt = 19;
+  string updatedAt = 20;
+  bool isDeleted = 21;
+  Chain chain = 22;
+}
+
