@@ -2,7 +2,6 @@ import { ChildProcess, spawn } from 'child_process';
 import { readContracts } from './utils';
 import {
   InsertionService,
-  LoggerService,
   QueueService,
   WebSocketService,
 } from './services';
@@ -14,6 +13,7 @@ import {
   ProcessCommand,
   SyncNodeConfig,
 } from './types';
+import {defaultLogger} from "./utils/logger";
 
 class SyncNode {
   /**
@@ -36,12 +36,6 @@ class SyncNode {
     InsertionService;
 
   /**
-   * # _loggerService
-   * @access private
-   */
-  private readonly _loggerService: typeof LoggerService = LoggerService;
-
-  /**
    * # _queueServivice
    */
   private readonly _queueService: typeof QueueService = QueueService;
@@ -60,7 +54,6 @@ class SyncNode {
 
   constructor(config: SyncNodeConfig) {
     this._config = config;
-    this._loggerService.construct(config.logger);
     this._queueService.construct(config.backup);
     this._webSocketService.construct(config.syncer);
   }
@@ -76,10 +69,10 @@ class SyncNode {
 
     if (this._config.backup.useBackup) {
       await this._queueService.loadBackup();
-      LoggerService.info(`Loaded Backup`);
+      defaultLogger.info(`loaded backup`);
     } else {
       await this._queueService.clearBackup();
-      LoggerService.info(`Cleared Backup`);
+      defaultLogger.info(`cleared backup`);
     }
 
     Object.keys(this._config.syncer.contracts).map(async (key) => {
@@ -95,7 +88,7 @@ class SyncNode {
     await this._insertionService.launch();
     // do not await for websocket to start
     this._webSocketService.launch();
-    LoggerService.info(`Launched All Services`);
+    defaultLogger.info(`launched all services`);
 
     await this._queueService.loadContracts();
 
@@ -116,7 +109,7 @@ class SyncNode {
       stdio: ['inherit', 'inherit', 'inherit', 'ipc'],
     });
     this._serverProcess.on('message', (message: ProcessCommand) => {
-      LoggerService.info(`Server Message: ${JSON.stringify(message)}`);
+      defaultLogger.info({message}, `server message`);
       if (message.command) {
         switch (message.command) {
           case 'contract_add': {
@@ -130,9 +123,7 @@ class SyncNode {
               if (controller) {
                 controller.addContract(message.contract, message.backfill);
               } else {
-                LoggerService.error(
-                  `Unable to add contract, ${message.dataType} controller missing`
-                );
+                defaultLogger.error({contract: message.contract, dataType: message.dataType}, 'unable to add contract, controller missing')
               }
             }
             break;
@@ -244,11 +235,5 @@ export default new SyncNode({
   },
   backup: {
     useBackup: process.env.USE_BACKUP === '1',
-  },
-  logger: {
-    datadog: {
-      apiKey: process.env.DATADOG_API_KEY || '',
-      appName: process.env.DATADOG_APP_NAME || '',
-    },
   },
 });

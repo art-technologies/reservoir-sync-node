@@ -1,6 +1,4 @@
 import express, { Application, NextFunction, Request, Response } from 'express';
-import { createHandler } from 'graphql-http/lib/use/express';
-import { GraphQlService } from './services/GraphQlService';
 import {
   Backup,
   Block,
@@ -117,13 +115,6 @@ class _Server {
 
     routes.forEach((route) => {
       this._app.use(route.path, route.handlers);
-    });
-
-    Object.keys(GraphQlService.getSchema()).forEach((key) => {
-      this._app.use(
-        `/graphql/${key}/`,
-        createHandler({ schema: GraphQlService.getSchema()[key] })
-      );
     });
 
     this._app.use('*', (req: Request, res: Response) => {

@@ -1,7 +1,7 @@
 import { createClient, RedisClientType } from "redis";
 import { Worker } from "../syncer/Worker";
 import { Backup, Block, DataTypes, QueueServiceConfig } from "../types";
-import { LoggerService } from "./LoggerService";
+import {defaultLogger} from "../utils/logger";
 
 /**
  * Queue class for managing a Redis-based queue.
@@ -52,7 +52,7 @@ class _Queue {
    * @constructor
    */
   constructor() {
-    this._client.on("error", (err) => LoggerService.error(err));
+    this._client.on("error", (err) => defaultLogger.error({err}, 'queue service error'));
   }
 
   /**
@@ -89,7 +89,7 @@ class _Queue {
     try {
       return await this._client.lLen(`${datatype}-queue-priority:${priority}`);
     } catch (e: unknown) {
-      LoggerService.error(e);
+      defaultLogger.error({e, datatype, priority}, 'failed to get queue length')
       return 0;
     }
   }
@@ -114,8 +114,7 @@ class _Queue {
 
       this.contracts[type] = combinedContracts;
     } catch (e: unknown) {
-      LoggerService.error(e);
-      return this.addContracts(contracts, type);
+      defaultLogger.error({e}, 'failed to add contracts')
     }
   }
 
@@ -131,7 +130,7 @@ class _Queue {
       );
       return contracts;
     } catch (e: unknown) {
-      LoggerService.error(e);
+      defaultLogger.error({e, type}, 'failed to get contracts')
       return [];
     }
   }
@@ -141,7 +140,7 @@ class _Queue {
    * @returns {Promise<void>} - A promise that resolves when the backups are cleared.
    */
   public async clearBackup(): Promise<void> {
-    LoggerService.info(`Clearing Backup`);
+    defaultLogger.info(`clearing backup`);
     const keys: string[] = ["transfers", "asks", "bids", "sales"];
 
     try {
@@ -153,16 +152,14 @@ class _Queue {
         })
       );
     } catch (e: unknown) {
-      LoggerService.error(`Error deleting queues`);
-      LoggerService.error(e);
+      defaultLogger.error({e}, 'error deleting queues')
       process.exit(0);
     }
 
     try {
       this._client.del("backups");
     } catch (e: unknown) {
-      LoggerService.error(`Error deleting backups`);
-      LoggerService.error(e);
+      defaultLogger.error({e}, 'error deleting backups')
       process.exit(0);
     }
   }
@@ -181,7 +178,7 @@ class _Queue {
     ] as DataTypes[]) {
       this.contracts[key] = await this.getContracts(key);
     }
-    LoggerService.info(`Loaded Contracts`);
+    defaultLogger.info(`loaded contracts`);
   }
 
   /**
@@ -200,14 +197,14 @@ class _Queue {
    */
   public async loadBackup(): Promise<void> {
     try {
-      LoggerService.info(`Loading Backup`);
+      defaultLogger.info(`loading backup`);
       this._backups = Object.fromEntries(
         Object.entries(await this._client.hGetAll("backups")).map(
           ([key, value]) => [key, JSON.parse(value) as Backup]
         )
       );
     } catch (e: unknown) {
-      LoggerService.error(e);
+      defaultLogger.error({e}, 'failed to load backup')
       return;
     }
   }
@@ -224,7 +221,7 @@ class _Queue {
       const queueName = `${datatype}-queue-priority:${priority}`;
       await this._client.lPush(queueName, JSON.stringify(block));
     } catch (e: unknown) {
-      LoggerService.error(e);
+      defaultLogger.error({e, block, datatype}, 'failed to insert block')
       return await this.insertBlock(block, datatype);
     }
   }
@@ -261,7 +258,7 @@ class _Queue {
    */
   public async launch(): Promise<void> {
     await this._client.connect();
-    LoggerService.info(`Queue Service Launched`);
+    defaultLogger.info(`queue service launched`);
   }
 }
 

@@ -11,7 +11,7 @@ import {
   WebSocketServiceConfig,
 } from '../types';
 import { InsertionService } from './InsertionService';
-import { LoggerService } from './LoggerService';
+import {defaultLogger} from "../utils/logger";
 
 /**
  * Class _WebSocketService provides an interface for working with WebSocket connections.
@@ -97,7 +97,7 @@ class _WebSocketService {
       const interval = setInterval(() => {
         if (this._isConnected) {
           clearInterval(interval);
-          LoggerService.info(`WebSocket Service Launched`);
+          defaultLogger.info(`websocket service launched`);
           resolve();
         }
       }, 1000);
@@ -150,12 +150,13 @@ class _WebSocketService {
         this._onConnect();
         return;
       } else if (type === 'connection' && status === 'error') {
-        LoggerService.error("failed to connect to websocket: " + JSON.stringify(data))
+        defaultLogger.error({data}, 'failed to connect to websocket')
+        return
       }
 
       this._insert(event, data);
     } catch (e: unknown) {
-      LoggerService.error(e);
+      defaultLogger.error({e, message}, 'failed to process websocket message')
     }
   }
 
@@ -201,7 +202,7 @@ class _WebSocketService {
         if (this._isConnected) clearInterval(r);
       }, 60000);
     } catch (e: unknown) {
-      LoggerService.error(e);
+      defaultLogger.error({e}, 'websocket error onClose')
     }
   }
 
@@ -212,7 +213,7 @@ class _WebSocketService {
    * @returns {void}
    */
   private _onError(e: WebSocketError): void {
-    LoggerService.error(e);
+    defaultLogger.error({e}, 'websocket onError handler')
   }
 
   /**

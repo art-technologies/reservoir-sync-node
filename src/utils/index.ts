@@ -9,7 +9,6 @@ import { utcToZonedTime } from "date-fns-tz";
 import fs from "fs";
 import path from "path";
 import { isAddress } from "web3-validator";
-import { LoggerService } from "../services";
 
 import {
   Chains,
@@ -20,6 +19,7 @@ import {
   SuccessType,
 } from "../types";
 import {reservoir} from "../pb/reservoir";
+import {defaultLogger} from "./logger";
 /**
  * # isTodayUTC
  * @param dateString - Date string
@@ -169,7 +169,7 @@ export const readContracts = (): Record<DataTypes, string[]> => {
 
     return hashMap;
   } catch (e: unknown) {
-    LoggerService.error(e);
+    defaultLogger.error({e}, 'failed to read contract.txt file')
     return hashMap;
   }
 };

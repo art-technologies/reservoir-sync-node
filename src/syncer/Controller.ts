@@ -9,7 +9,7 @@ import {
   WorkerEvent,
 } from "types";
 import { v4 } from "uuid";
-import { InsertionService, LoggerService, QueueService } from "../services";
+import { InsertionService, QueueService } from "../services";
 import {
   delay,
   isSuccessResponse,
@@ -20,6 +20,7 @@ import {
   WorkerCounts,
 } from "../utils";
 import { Worker } from "./Worker";
+import {defaultLogger} from "../utils/logger";
 
 const SYNC_NODE_VERSION = process.env.npm_package_version;
 
@@ -83,13 +84,15 @@ export class Controller {
       const block = await this._getInitialBlock(contract);
       if (block) {
         await this._queue.insertBlock(block, this._config.dataset);
-        LoggerService.info(
-          `Controller Backfilling ${this._config.dataset}:${contract}`
+        defaultLogger.info(
+          {dataset: this._config.dataset, contract},
+          `controller backfilling`
         );
       }
     } else {
-      LoggerService.info(
-        `Controller added ${this._config.dataset}:${contract}`
+      defaultLogger.info(
+        {dataset: this._config.dataset, contract},
+        `controller added`
       );
     }
   }
@@ -132,7 +135,7 @@ export class Controller {
     this._queue.backup(this._config.dataset, this._workers);
   }
   private async _launchBackup(_backup: Backup): Promise<void> {
-    LoggerService.info(`Launching from backup`);
+    defaultLogger.info({backup: _backup}, `launching from backup`);
     const backup = _backup;
     await this._queue.clearBackup();
     for (let i = 0; i < backup.workers.length; i++) {
@@ -145,7 +148,7 @@ export class Controller {
           },
           continuation ? false : true
         );
-        LoggerService.info(`Launched block: ${block.id}`);
+        defaultLogger.info({block}, `launched block`);
         await delay(30000);
       }
     }
@@ -167,7 +170,7 @@ export class Controller {
         })
       );
       i += promises.length;
-      LoggerService.info(`${i}/${contracts.length} Blocks created`);
+      defaultLogger.info({i, total: contracts.length}, 'blocks created');
       blocks.push(...(promises.filter((block) => block !== null) as Block[]));
     }
 
@@ -260,20 +263,14 @@ export class Controller {
     ]);
 
     if (!isSuccessResponse(reqs[0]) || !isSuccessResponse(reqs[1])) {
-      LoggerService.warn(
-        `Intiailizing blocks failed: ${reqs.map(
-          (r, i) => `${r.status}:${i} ${contract ?? contract}`
-        )}`
-      );
+      defaultLogger.warn({reqs, contract}, 'initializing blocks failed')
       return null;
     }
 
     const root = RecordRoots[this._config.dataset];
 
     if (reqs[1].data[root].length === 0 || reqs[0].data[root].length === 0) {
-      LoggerService.warn(
-        `Unable to create block for: ${contract}. No records found.`
-      );
+      defaultLogger.warn({reqs, contract}, 'unable to create block for contract: no records found')
       return null;
     }
 

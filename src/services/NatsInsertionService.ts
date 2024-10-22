@@ -10,9 +10,9 @@ import {
     TransfersSchema,
 } from "../types";
 import {getPbChain} from "../utils";
-import { LoggerService } from "./LoggerService";
 import { QueueService } from "./QueueService";
 import {reservoir} from "../pb/reservoir";
+import {defaultLogger} from "../utils/logger";
 /**
  *
  *
@@ -38,7 +38,7 @@ class _NatsInsertionService {
         // Create a JetStream client
         this.natsJs = nc.jetstream();
 
-        LoggerService.info(`Insertion Service Launched`);
+        defaultLogger.info(`insertion service launched`);
     }
 
     /**`
@@ -99,7 +99,7 @@ class _NatsInsertionService {
                         break;
                     }
                     default:
-                        LoggerService.error(`NatsInsertionService: unknown type ${type}`)
+                        defaultLogger.error({type}, 'NatsInsertionService: unknown type')
                 }
             } catch (e) {
                 console.error(e, type, record)

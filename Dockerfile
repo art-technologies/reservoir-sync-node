@@ -8,7 +8,6 @@ RUN npm install
 
 COPY . .
 
-RUN npm run database:generate
 RUN npm run build
 RUN npm run build:viewer
 
@@ -19,7 +18,6 @@ RUN apt-get update -y && apt-get install -y openssl
 WORKDIR /app
 
 COPY --from=build /app/package.json /app/package-lock.json ./
-COPY --from=build /app/prisma ./prisma
 RUN touch ./.env
 
 RUN npm install --production

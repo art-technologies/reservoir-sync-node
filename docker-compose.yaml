@@ -36,17 +36,6 @@ services:
     profiles:
       - app
 
-  db:
-    image: postgres:13
-    environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: mydb
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"  # Map container port 5432 to host port 5432 for database access
-
   redis:
     image: redis:7.4.0-alpine
     volumes:
@@ -68,5 +57,4 @@ services:
     command: -m 8222 -js --cluster_name NATS --cluster nats://0.0.0.0:6222 --name n3 --routes nats://nats:6222,nats://nats2:6222,nats://nats3:6222
 
 volumes:
-  postgres_data:
   redis_data:

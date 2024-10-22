@@ -1,6 +1,5 @@
 import EventEmitter from "events";
 import { v4 } from "uuid";
-import { LoggerService as Logger } from "../services";
 import { Block, DataTypes, ErrorType, Schemas, WorkerEvent } from "../types";
 import {
   delay,
@@ -12,6 +11,7 @@ import {
   END_OF_TIME,
 } from "../utils";
 import { Controller } from "./Controller";
+import {defaultLogger} from "../utils/logger";
 
 interface WorkerData {
   block: Block | null;
@@ -116,7 +116,7 @@ export class Worker extends EventEmitter {
         return this._release({ startDate, id, endDate, contract, priority });
       }
 
-      Logger.warn(`Graining Block\nid:${id}`);
+      defaultLogger.warn({id}, 'graining block')
 
       // eslint-disable-next-line no-constant-condition
       while (true) {
@@ -175,10 +175,10 @@ export class Worker extends EventEmitter {
 
         break;
       }
-      Logger.info(`(${this._datatype} ${contract}) Grained Block\nid:${id}`);
+      defaultLogger.info({datatype: this._datatype, contract, id}, `Grained Block`);
     }
 
-    Logger.warn(`(${this._datatype} ${contract}) Processing Block \nid: ${id}`);
+    defaultLogger.warn({datatype: this._datatype, contract, id}, 'processing block')
     // eslint-disable-next-line no-constant-condition
     while (true) {
       const res = await this._request(
@@ -215,8 +215,9 @@ export class Worker extends EventEmitter {
         break;
       } else this.continuation = res.data.continuation;
     }
-    Logger.info(
-      `(${this._datatype} ${contract}) Processed Block ${id}\nstartDate: ${startDate} endDate: ${endDate}`
+    defaultLogger.info(
+        {datatype: this._datatype, contract, startDate, endDate, id},
+        'processed block'
     );
     this._release({ startDate, endDate, id, contract, priority });
   }
@@ -314,7 +315,7 @@ export class Worker extends EventEmitter {
    * @param {Block} block - The block to emit a release event for.
    */
   private _release(block: Block): void {
-    Logger.info(`Released block: ${block.id}`);
+    defaultLogger.info({block}, `released block`);
     this.busy = false;
     this.continuation = "";
     this.emit("worker.event", {

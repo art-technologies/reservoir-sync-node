@@ -213,12 +213,6 @@ export interface SyncNodeConfig {
   backup: {
     useBackup: boolean;
   };
-  logger: {
-    datadog: {
-      apiKey: string;
-      appName: string;
-    };
-  };
 }
 
 export interface AsksSchema {
