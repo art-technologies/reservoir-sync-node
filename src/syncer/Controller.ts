@@ -345,7 +345,7 @@ export class Controller {
     }
 
     if (this._config.dataset === "asks" || this._config.dataset === "bids") {
-      isBackfill && queries.push(`status=active`);
+      isBackfill && queries.push(`status=any`);
     }
 
     if (this._config.dataset === "sales") {

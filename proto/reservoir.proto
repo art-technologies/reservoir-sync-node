@@ -45,9 +45,15 @@ message CollectionData {
   string image = 3;
 }
 
+message AttributeData {
+  string key = 1;
+  string value = 2;
+}
+
 message CriteriaData {
-  TokenData token = 1;
-  CollectionData collection = 2;
+  optional TokenData token = 1;
+  optional CollectionData collection = 2;
+  optional AttributeData attribute = 3;
 }
 
 message Criteria {

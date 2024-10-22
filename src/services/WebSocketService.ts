@@ -100,7 +100,7 @@ class _WebSocketService {
           LoggerService.info(`WebSocket Service Launched`);
           resolve();
         }
-      }, 100);
+      }, 1000);
     });
   }
 

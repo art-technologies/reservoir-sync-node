@@ -175,10 +175,10 @@ export class Worker extends EventEmitter {
 
         break;
       }
-      Logger.info(`Grained Block\nid:${id}`);
+      Logger.info(`(${this._datatype} ${contract}) Grained Block\nid:${id}`);
     }
 
-    Logger.warn(`Processing Block \nid: ${id}`);
+    Logger.warn(`(${this._datatype} ${contract}) Processing Block \nid: ${id}`);
     // eslint-disable-next-line no-constant-condition
     while (true) {
       const res = await this._request(
@@ -216,7 +216,7 @@ export class Worker extends EventEmitter {
       } else this.continuation = res.data.continuation;
     }
     Logger.info(
-      `Processed Block ${id}\nstartDate: ${startDate} endDate: ${endDate}`
+      `(${this._datatype} ${contract}) Processed Block ${id}\nstartDate: ${startDate} endDate: ${endDate}`
     );
     this._release({ startDate, endDate, id, contract, priority });
   }
