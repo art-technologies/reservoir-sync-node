@@ -102,7 +102,7 @@ class _NatsInsertionService {
                         defaultLogger.error({type}, 'NatsInsertionService: unknown type')
                 }
             } catch (e) {
-                console.error(e, type, record)
+                defaultLogger.error({e, type, record}, 'failed to upsert into nats')
             }
         }
     }

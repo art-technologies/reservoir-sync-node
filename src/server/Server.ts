@@ -11,6 +11,7 @@ import routes from './routes';
 import cors from 'cors';
 import { RedisClientType, createClient } from 'redis';
 import path from 'path';
+import {defaultLogger} from "../utils/logger";
 
 /**
  * The _Server class encapsulates an Express application and provides methods for
@@ -50,7 +51,7 @@ class _Server {
   public async launch(): Promise<void> {
     this._client.on('error', (err) =>
       // eslint-disable-next-line no-console
-      console.log('Servier: Failed to connect to redis', err)
+      defaultLogger.error({err}, 'failed to connect to redis')
     );
     process.on('message', (message: ProcessCommand) => {
       if (message.command && message.dataType) {
@@ -77,7 +78,7 @@ class _Server {
     return new Promise((resolve) => {
       this._app.listen(this._config.port, () => {
         // eslint-disable-next-line no-console
-        console.log('Server Service Launched');
+        defaultLogger.info('server service launched')
         resolve();
       });
     });
