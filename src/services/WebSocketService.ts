@@ -12,6 +12,7 @@ import {
 } from '../types';
 import { InsertionService } from './InsertionService';
 import {defaultLogger} from "../utils/logger";
+import {createClient, RedisClientType} from "redis";
 
 /**
  * Class _WebSocketService provides an interface for working with WebSocket connections.
@@ -54,6 +55,16 @@ class _WebSocketService {
       asks: false,
     },
   };
+
+  /**
+   * Redis client instance
+   * @type {RedisClientType}
+   * @private
+   */
+  private _redisClient: RedisClientType = createClient({
+    url: process.env.REDIS_URL as string,
+  });
+
 
   /**
    * Configures the WebSocket service with provided configuration.
@@ -137,7 +148,7 @@ class _WebSocketService {
    * @private
    * @returns {void}
    */
-  private _onMessage(message: Buffer): void {
+  private async _onMessage(message: Buffer): Promise<void> {
     try {
       const { type, status, data, event }: WebSocketMessage = JSON.parse(
         message.toString('utf-8')
@@ -152,6 +163,29 @@ class _WebSocketService {
       } else if (type === 'connection' && status === 'error') {
         defaultLogger.error({data}, 'failed to connect to websocket')
         return
+      }
+
+      let contract = ""
+      let setKey = ""
+      if (event.includes("sales")) {
+        contract = (data as SalesSchema).token.contract
+        setKey = `sales.contracts`
+      } else if (event.includes("transfers")) {
+        contract = (data as TransfersSchema).token.contract
+        setKey = `transfers.contracts`
+      }  else if (event.includes("asks")) {
+        contract = (data as AsksSchema).contract
+        setKey = `asks.contracts`
+      } else if (event.includes("bids")) {
+        contract = (data as BidsSchema).contract
+        setKey = `bids.contracts`
+      }
+
+      if (setKey !== "") {
+        const isMember = await this._redisClient.sIsMember(setKey, contract)
+        if (!isMember) {
+          return
+        }
       }
 
       this._insert(event, data);
@@ -169,7 +203,7 @@ class _WebSocketService {
    */
   private _insert(
     event: string,
-    data: AsksSchema | BidsSchema | SalesSchema
+    data: AsksSchema | BidsSchema | SalesSchema | TransfersSchema
   ): void {
     if (event?.includes('ask')) {
       InsertionService.upsert('asks', [data as AsksSchema]);

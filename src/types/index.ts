@@ -153,7 +153,7 @@ export interface WebSocketMessage {
   type: MessageType;
   event: MessageEvent;
   status: string;
-  data: AsksSchema | SalesSchema | BidsSchema;
+  data: AsksSchema | SalesSchema | BidsSchema | TransfersSchema;
 }
 
 export interface WebSocketError {
