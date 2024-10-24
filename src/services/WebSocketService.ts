@@ -167,16 +167,16 @@ class _WebSocketService {
 
       let contract = ""
       let setKey = ""
-      if (event.includes("sales")) {
+      if (event?.includes("sale")) {
         contract = (data as SalesSchema).token.contract
         setKey = `sales.contracts`
-      } else if (event.includes("transfers")) {
+      } else if (event?.includes("transfer")) {
         contract = (data as TransfersSchema).token.contract
         setKey = `transfers.contracts`
-      }  else if (event.includes("asks")) {
+      } else if (event?.includes("ask")) {
         contract = (data as AsksSchema).contract
         setKey = `asks.contracts`
-      } else if (event.includes("bids")) {
+      } else if (event?.includes("bid")) {
         contract = (data as BidsSchema).contract
         setKey = `bids.contracts`
       }
