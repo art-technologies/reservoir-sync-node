@@ -123,12 +123,13 @@ export class Controller {
     } else {
       if (contracts.length > 0) {
         this._handleContracts();
-      } else {
-        const worker = this._workers.find(({ busy }) => !busy) as Worker;
-        const block = await this._getInitialBlock();
-        if (!block) return;
-        worker.process(block);
       }
+      // else {
+      //   const worker = this._workers.find(({ busy }) => !busy) as Worker;
+      //   const block = await this._getInitialBlock();
+      //   if (!block) return;
+      //   worker.process(block);
+      // }
     }
 
     this._upkeeper?.upkeep();

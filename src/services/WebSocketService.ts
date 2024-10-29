@@ -103,6 +103,7 @@ class _WebSocketService {
    * @returns {Promise<void>} A promise that resolves when the WebSocket service is launched
    */
   public async launch(): Promise<void> {
+    await this._redisClient.connect();
     return new Promise((resolve) => {
       this._connect();
       const interval = setInterval(() => {
@@ -190,7 +191,7 @@ class _WebSocketService {
 
       this._insert(event, data);
     } catch (e: unknown) {
-      defaultLogger.error({e, message}, 'failed to process websocket message')
+      defaultLogger.error({e, errMessage: e?.toString(), message: message.toString('utf-8')}, 'failed to process websocket message')
     }
   }
 

@@ -8,6 +8,7 @@ export function createLogger(name?: string) {
         level: logLevel,
         name: name,
         serializers: {
+            e: pino.stdSerializers.err,
             err: pino.stdSerializers.err,
             error: pino.stdSerializers.err
         },

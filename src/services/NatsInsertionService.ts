@@ -34,7 +34,7 @@ class _NatsInsertionService {
 
         const jsm: JetStreamManager = await nc.jetstreamManager();
         // Ensure a stream exists
-        await jsm.streams.add({ name: "reservoir", subjects: ["reservoir.*.*"], num_replicas: 3 });
+        await jsm.streams.add({ name: "reservoir", subjects: ["reservoir.*.*.*"], num_replicas: 3 });
         // Create a JetStream client
         this.natsJs = nc.jetstream();
 
@@ -56,46 +56,56 @@ class _NatsInsertionService {
                 switch (type) {
                     case "asks": {
                         const ask = record as AsksSchema;
+                        defaultLogger.info({type, data: ask}, "publishing ask to nats")
                         const askPb = reservoir.Ask.create({
                             ...ask,
                             id: ask?.id,
                             chain: chain,
                         })
                         const messageBuffer = reservoir.Ask.encode(askPb).finish()
-                        await this.natsJs?.publish(`reservoir.${type}.${askPb.id}`, messageBuffer);
+                        await this.natsJs?.publish(`reservoir.${type}.${askPb.contract.toLowerCase()}.${askPb.id}`, messageBuffer);
                         break;
                     }
                     case "bids": {
                         const bid = record as BidsSchema;
+                        defaultLogger.info({type, data: bid}, "publishing bid to nats")
                         const bidPb = reservoir.Bid.create({
                             ...bid,
                             id: bid?.id,
                             chain: chain,
                         })
                         const messageBuffer = reservoir.Bid.encode(bidPb).finish()
-                        await this.natsJs?.publish(`reservoir.${type}.${bidPb.id}`, messageBuffer);
+                        await this.natsJs?.publish(`reservoir.${type}.${bidPb.contract.toLowerCase()}.${bidPb.id}`, messageBuffer);
                         break;
                     }
                     case "sales": {
                         const sale = record as SalesSchema;
+                        defaultLogger.info({type, data: sale}, "publishing sale to nats")
                         const salePb = reservoir.Sale.create({
                             ...sale,
                             id: `${sale.txHash}-${sale.logIndex}-${sale.batchIndex}`,
                             chain: chain,
                         })
                         const messageBuffer = reservoir.Sale.encode(salePb).finish()
-                        await this.natsJs?.publish(`reservoir.${type}.${salePb.id}`, messageBuffer);
+                        if (salePb.token == null || salePb.token.contract == null) {
+                            continue
+                        }
+                        await this.natsJs?.publish(`reservoir.${type}.${salePb.token.contract.toLowerCase()}.${salePb.id}`, messageBuffer);
                         break;
                     }
                     case "transfers": {
                         const transfer = record as TransfersSchema;
+                        defaultLogger.info({type, data: transfer}, "publishing transfer to nats")
                         const transferPb = reservoir.Transfer.create({
                             ...transfer,
                             id: `${transfer.txHash}-${transfer.logIndex}-${transfer.batchIndex}`,
                             chain: chain,
                         })
                         const messageBuffer = reservoir.Transfer.encode(transferPb).finish()
-                        await this.natsJs?.publish(`reservoir.${type}.${transferPb.id}`, messageBuffer);
+                        if (transferPb.token == null || transferPb.token.contract == null) {
+                            continue
+                        }
+                        await this.natsJs?.publish(`reservoir.${type}.${transferPb.token.contract.toLowerCase()}.${transferPb.id}`, messageBuffer);
                         break;
                     }
                     default:
@@ -106,6 +116,7 @@ class _NatsInsertionService {
             }
         }
     }
+
     /**
      * Filters the input data based on the available contracts.
      * @param {DataTypes} type - The type of the data ('asks', 'bids', 'sales').

@@ -1,4 +1,4 @@
-import express, { Application, NextFunction, Request, Response } from 'express';
+import express, { Application, Request, Response } from 'express';
 import {
   Backup,
   Block,
@@ -8,7 +8,6 @@ import {
   ServerConfig,
 } from '../types';
 import routes from './routes';
-import cors from 'cors';
 import { RedisClientType, createClient } from 'redis';
 import path from 'path';
 import {defaultLogger} from "../utils/logger";
@@ -91,28 +90,8 @@ class _Server {
    */
   public construct(config: ServerConfig) {
     this._config = config;
-    this._app.use(cors({ credentials: true, origin: 'http://localhost:3000' }));
+    // this._app.use(cors({ credentials: true, origin: 'http://localhost:3000' }));
     this._app.use(express.static(path.join(__dirname, '../viewer')));
-    const allowedRouteRegex =
-      /^\/static\/(?:js|css)\/main\.\d+[a-zA-Z0-9]*\.(?:js|css)$|^\/viewer$/m;
-
-    this._app.use('*', (req: Request, res: Response, next: NextFunction) => {
-      if (
-        req.method !== 'OPTIONS' &&
-        !allowedRouteRegex.test(req.baseUrl) &&
-        req.get('Authorization') !== this._config.authorization
-      ) {
-        res.status(403).json({
-          error: {
-            status: 403,
-            message: 'Unauthorized',
-          },
-          data: null,
-        });
-      } else {
-        next('route');
-      }
-    });
 
     routes.forEach((route) => {
       this._app.use(route.path, route.handlers);
