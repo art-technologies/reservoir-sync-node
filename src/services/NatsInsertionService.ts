@@ -130,8 +130,6 @@ class _NatsInsertionService {
             s.toLowerCase()
         );
 
-        if (contracts.length === 0 && sources.length === 0) return data;
-
         switch (type) {
             case "transfers":
                 return (data as TransfersSchema[]).filter((set) =>
@@ -140,8 +138,7 @@ class _NatsInsertionService {
             case "asks":
                 return (data as AsksSchema[]).filter((set) => {
                     return (
-                        (contracts.length === 0 ||
-                            contracts.includes(set?.contract?.toLowerCase())) &&
+                        (contracts.includes(set?.contract?.toLowerCase())) &&
                         (sources.length === 0 ||
                             sources.includes(set?.source?.domain.toLowerCase()))
                     );
@@ -149,8 +146,7 @@ class _NatsInsertionService {
             case "bids":
                 return (data as BidsSchema[]).filter((set) => {
                     return (
-                        (contracts.length === 0 ||
-                            contracts.includes(set?.contract?.toLowerCase())) &&
+                        (contracts.includes(set?.contract?.toLowerCase())) &&
                         (sources.length === 0 ||
                             sources.includes(set?.source?.domain.toLowerCase()))
                     );
@@ -158,8 +154,7 @@ class _NatsInsertionService {
             case "sales":
                 return (data as SalesSchema[]).filter(
                     (set) =>
-                        (contracts.length === 0 ||
-                            contracts.includes(set?.token?.contract?.toLowerCase())) &&
+                        (contracts.includes(set?.token?.contract?.toLowerCase())) &&
                         (sources.length === 0 || sources.includes(set?.orderSource))
                 );
             default:

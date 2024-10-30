@@ -187,6 +187,8 @@ class _WebSocketService {
         if (!isMember) {
           return
         }
+      } else {
+        return
       }
 
       this._insert(event, data);
