@@ -128,8 +128,8 @@ class _WebSocketService {
     }
 
     if (this._config.toSync.bids) {
-      this._subscribe('bid.created');
-      this._subscribe('bid.updated');
+      // this._subscribe('bid.created');
+      // this._subscribe('bid.updated');
     }
 
     if (this._config.toSync.sales) {
