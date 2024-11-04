@@ -34,7 +34,10 @@ class _NatsInsertionService {
 
         const jsm: JetStreamManager = await nc.jetstreamManager();
         // Ensure a stream exists
-        await jsm.streams.add({ name: "reservoir", subjects: ["reservoir.*.*.*"], num_replicas: 3 });
+        await jsm.streams.add({ name: "reservoir-asks", subjects: ["reservoir.asks.*.*"], num_replicas: 3 });
+        await jsm.streams.add({ name: "reservoir-bids", subjects: ["reservoir.bids.*.*"], num_replicas: 3 });
+        await jsm.streams.add({ name: "reservoir-sales", subjects: ["reservoir.sales.*.*"], num_replicas: 3 });
+        await jsm.streams.add({ name: "reservoir-transfers", subjects: ["reservoir.transfers.*.*"], num_replicas: 3 });
         // Create a JetStream client
         this.natsJs = nc.jetstream();
 
