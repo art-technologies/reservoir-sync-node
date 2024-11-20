@@ -59,7 +59,7 @@ class _NatsInsertionService {
                 switch (type) {
                     case "asks": {
                         const ask = record as AsksSchema;
-                        defaultLogger.info({type, data: ask}, "publishing ask to nats")
+                        // defaultLogger.info({type, data: ask}, "publishing ask to nats")
                         const askPb = reservoir.Ask.create({
                             ...ask,
                             id: ask?.id,
@@ -71,7 +71,7 @@ class _NatsInsertionService {
                     }
                     case "bids": {
                         const bid = record as BidsSchema;
-                        defaultLogger.info({type, data: bid}, "publishing bid to nats")
+                        // defaultLogger.info({type, data: bid}, "publishing bid to nats")
                         const bidPb = reservoir.Bid.create({
                             ...bid,
                             id: bid?.id,
@@ -83,7 +83,7 @@ class _NatsInsertionService {
                     }
                     case "sales": {
                         const sale = record as SalesSchema;
-                        defaultLogger.info({type, data: sale}, "publishing sale to nats")
+                        // defaultLogger.info({type, data: sale}, "publishing sale to nats")
                         const salePb = reservoir.Sale.create({
                             ...sale,
                             id: `${sale.txHash}-${sale.logIndex}-${sale.batchIndex}`,
@@ -98,7 +98,7 @@ class _NatsInsertionService {
                     }
                     case "transfers": {
                         const transfer = record as TransfersSchema;
-                        defaultLogger.info({type, data: transfer}, "publishing transfer to nats")
+                        // defaultLogger.info({type, data: transfer}, "publishing transfer to nats")
                         const transferPb = reservoir.Transfer.create({
                             ...transfer,
                             id: `${transfer.txHash}-${transfer.logIndex}-${transfer.batchIndex}`,
